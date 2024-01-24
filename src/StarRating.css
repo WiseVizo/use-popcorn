@@ -1,0 +1,24 @@
+/* StarRating.css */
+
+.star-rating-container {
+  display: flex;
+  align-items: center;
+}
+
+.star {
+  font-size: 24px;
+  color: rgb(128, 128, 128);
+  cursor: pointer;
+  transition: color 0.2s ease-in-out;
+}
+
+.star-filled {
+  color: gold;
+  font-size: 24px;
+  cursor: pointer;
+  transition: color 0.2s ease-in-out;
+}
+
+.rating-text {
+  margin-left: 15px; /* Adjust the margin as needed */
+}
