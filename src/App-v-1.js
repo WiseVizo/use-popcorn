@@ -50,29 +50,50 @@ const tempWatchedData = [
 const average = (arr) =>
   arr.reduce((acc, cur, i, arr) => acc + cur / arr.length, 0);
 
-const KEY = "9b242b09";
-const query = "Inception";
+const KEY = "9b242b09"; // api key
 
 export default function App() {
-  const [movies, setMovies] = useState(tempMovieData);
+  const [movies, setMovies] = useState([]);
   const [watched, setWatched] = useState(tempWatchedData);
+  const [query, setQuery] = useState("Inception");
+  const [isLoading, SetIsLoading] = useState(false);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     async function getMoviesList() {
-      const res = await fetch(
-        `http://www.omdbapi.com/?i=tt3896198&apikey=${KEY}&s=${query}`
-      );
-      const data = await res.json();
-      setMovies(data.Search);
+      try {
+        SetIsLoading(true);
+        setError(null);
+        const res = await fetch(
+          `http://www.omdbapi.com/?i=tt3896198&apikey=${KEY}&s=${query}`
+        );
+        if (!res.ok) {
+          throw new Error("something went wrong while fetching movies");
+        }
+        const data = await res.json();
+        console.log(data);
+
+        if (data.Response === "False") {
+          setMovies([]);
+          throw new Error("Movies not Found!");
+        }
+
+        setMovies(data.Search);
+      } catch (err) {
+        console.error(err.message);
+        setError(err.message);
+      } finally {
+        SetIsLoading(false);
+      }
     }
     getMoviesList();
-  }, []);
+  }, [query]);
 
   return (
     <>
-      <NavBar>
+      <NavBar query={query} setQuery={setQuery}>
         <p className="num-results">
-          Found <strong>{movies.length}</strong> results
+          Found <strong>{movies ? movies.length : 0}</strong> results
         </p>
       </NavBar>
       <Main
@@ -83,18 +104,44 @@ export default function App() {
             <WatchedMoivesList watched={watched} />
           </>
         }
+        isLoading={isLoading}
+        error={error}
       />
     </>
   );
 }
 
-function Main({ element1, element2 }) {
+function ErrorMessage({ message }) {
+  return <p className="error">{message}</p>;
+}
+
+function SearchBar({ query, setQuery }) {
+  return (
+    <input
+      className="search"
+      type="text"
+      placeholder="Search movies..."
+      value={query}
+      onChange={(e) => setQuery(e.target.value)}
+    />
+  );
+}
+
+function Main({ element1, element2, isLoading, error }) {
   return (
     <main className="main">
-      <Box>{element1}</Box>
+      <Box>
+        {isLoading && <Loader />}
+        {error && <ErrorMessage message={error} />}
+        {!isLoading && !error && element1}
+      </Box>
       <Box>{element2}</Box>
     </main>
   );
+}
+
+function Loader() {
+  return <p className="loader">Loading...</p>;
 }
 
 function WatchedMoivesList({ watched }) {
@@ -172,6 +219,7 @@ function Box({ children }) {
 }
 
 function MovieList({ movies, setMovies }) {
+  // const [loading, setLoading] = useState(movies ? false : true);
   return (
     <ul className="list">
       {movies?.map((movie) => (
@@ -196,26 +244,13 @@ function Movie({ movie }) {
   );
 }
 
-function NavBar({ children }) {
+function NavBar({ children, query, setQuery }) {
   return (
     <nav className="nav-bar">
       <Logo />
-      <SearchBar />
+      <SearchBar query={query} setQuery={setQuery} />
       {children}
     </nav>
-  );
-}
-
-function SearchBar() {
-  const [query, setQuery] = useState("");
-  return (
-    <input
-      className="search"
-      type="text"
-      placeholder="Search movies..."
-      value={query}
-      onChange={(e) => setQuery(e.target.value)}
-    />
   );
 }
 
