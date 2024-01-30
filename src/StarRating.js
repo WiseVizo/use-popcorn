@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import "./StarRating.css";
 
-const StarRating = ({ maxRating = 5 }) => {
-  const [rating, setRating] = useState(0);
+const StarRating = ({ maxRating = 5, rating, setRating }) => {
+  // const [rating, setRating] = useState(0);
   const [clickedRating, setClickedRating] = useState(0);
 
   const handleHover = (hoverRating) => {
@@ -32,7 +32,7 @@ const StarRating = ({ maxRating = 5 }) => {
           &#9733; {/* Unicode character for a star */}
         </span>
       ))}
-      <p className="rating-text">Rating: {rating}</p>
+      <p className="rating-text">{rating ? `Rating: ${rating}` : ""}</p>
     </div>
   );
 };
