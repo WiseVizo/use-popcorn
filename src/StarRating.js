@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import "./StarRating.css";
 
-const StarRating = ({ maxRating }) => {
+const StarRating = ({ maxRating = 5 }) => {
   const [rating, setRating] = useState(0);
   const [clickedRating, setClickedRating] = useState(0);
 

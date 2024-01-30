@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import StarRating from "./StarRating";
 
 const tempMovieData = [
   {
@@ -151,12 +152,85 @@ function SearchBar({ query, setQuery }) {
 }
 
 function SelectedMovie({ id, handleCloseMovie }) {
+  const [movie, setMovie] = useState({});
+  const [isLoading, setIsLoading] = useState(false);
+  const {
+    Title,
+    Year,
+    Poster,
+    Runtime,
+    imdbRating,
+    Plot,
+    Released,
+    Actors,
+    Director,
+    Genre,
+  } = movie;
+  useEffect(() => {
+    async function getSelectedMovieData(id) {
+      setIsLoading(true);
+      console.log(id);
+      const res = await fetch(`http://www.omdbapi.com/?&apikey=${KEY}&i=${id}`);
+      const data = await res.json();
+      console.log(data);
+      setMovie(data);
+      setIsLoading(false);
+    }
+    getSelectedMovieData(id);
+  }, [id]);
   return (
     <div className="details">
-      <button className="btn-back" onClick={handleCloseMovie}>
-        &larr;
-      </button>
-      {id}
+      {isLoading ? (
+        <Loader />
+      ) : (
+        <>
+          <header>
+            <button className="btn-back" onClick={handleCloseMovie}>
+              &larr;
+            </button>
+            <img src={Poster} alt={`Poster of ${movie} movie`} />
+            <div className="details-overview">
+              <h2>{Title}</h2>
+              <p>
+                {Released} &bull; {Runtime}
+              </p>
+              <p>{Genre}</p>
+              <p>
+                <span>⭐️</span>
+                {imdbRating} IMDb rating
+              </p>
+            </div>
+          </header>
+          <section>
+            <div className="rating">
+              <StarRating maxRating={10} />
+              {/* {!isWatched ? (
+                <>
+                  <StarRating
+                    maxRating={10}
+                    size={24}
+                    onSetRating={setUserRating}
+                  />
+                  {userRating > 0 && (
+                    <button className="btn-add" onClick={handleAdd}>
+                      + Add to list
+                    </button>
+                  )}
+                </>
+              ) : (
+                <p>
+                  You rated with movie {watchedUserRating} <span>⭐️</span>
+                </p>
+              )} */}
+            </div>
+            <p>
+              <em>{Plot}</em>
+            </p>
+            <p>Starring {Actors}</p>
+            <p>Directed by {Director}</p>
+          </section>
+        </>
+      )}
     </div>
   );
 }
