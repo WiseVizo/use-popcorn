@@ -61,6 +61,13 @@ export default function App() {
   const [error, setError] = useState(null);
   const [selectedId, setSelectedId] = useState(null);
 
+  function deleteFromWatchedList(ID) {
+    const newList = watched.filter((movie) => {
+      return !(movie.imdbID === ID);
+    });
+    setWatched(newList);
+  }
+
   function addToWatchedList(movieData = {}) {
     const WatchedMovie = watched.filter((movie) => {
       return movie.imdbID === movieData.imdbID;
@@ -142,7 +149,10 @@ export default function App() {
         element2={
           <>
             <Summary watched={watched} />
-            <WatchedMoivesList watched={watched} />
+            <WatchedMoivesList
+              watched={watched}
+              deleteFromWatchedList={deleteFromWatchedList}
+            />
           </>
         }
         isLoading={isLoading}
@@ -310,17 +320,21 @@ function Loader() {
   return <p className="loader">Loading...</p>;
 }
 
-function WatchedMoivesList({ watched }) {
+function WatchedMoivesList({ watched, deleteFromWatchedList }) {
   return (
     <ul className="list">
       {watched.map((movie) => (
-        <WatchedMovies movie={movie} key={movie.imdbID} />
+        <WatchedMovies
+          movie={movie}
+          key={movie.imdbID}
+          deleteFromWatchedList={deleteFromWatchedList}
+        />
       ))}
     </ul>
   );
 }
 
-function WatchedMovies({ movie }) {
+function WatchedMovies({ movie, deleteFromWatchedList }) {
   return (
     <li>
       <img src={movie.Poster} alt={`${movie.Title} poster`} />
@@ -337,6 +351,14 @@ function WatchedMovies({ movie }) {
         <p>
           <span>⏳</span>
           <span>{movie.Runtime} min</span>
+        </p>
+        <p>
+          <button
+            className="btn-delete"
+            onClick={() => deleteFromWatchedList(movie.imdbID)}
+          >
+            &#x1F5D1;
+          </button>
         </p>
       </div>
     </li>
@@ -357,11 +379,11 @@ function Summary({ watched }) {
         </p>
         <p>
           <span>⭐️</span>
-          <span>{avgImdbRating}</span>
+          <span>{avgImdbRating.toFixed(2)}</span>
         </p>
         <p>
           <span>🌟</span>
-          <span>{avgUserRating}</span>
+          <span>{avgUserRating.toFixed(2)}</span>
         </p>
         <p>
           <span>⏳</span>
