@@ -61,6 +61,11 @@ export default function App() {
   const [error, setError] = useState(null);
   const [selectedId, setSelectedId] = useState(null);
 
+  useEffect(() => {
+    if (selectedId) return;
+    document.title = "usePopcorn";
+  }, [selectedId]);
+
   function deleteFromWatchedList(ID) {
     const newList = watched.filter((movie) => {
       return !(movie.imdbID === ID);
@@ -80,7 +85,7 @@ export default function App() {
           movie.userRating = movieData.userRating;
         }
       });
-      console.log(movies);
+      // console.log(movies);
       setWatched([...watched]);
       return;
     }
@@ -94,6 +99,7 @@ export default function App() {
 
   function handleCloseMovie() {
     setSelectedId(null);
+    // console.log(`in ${selectedId}`);
   }
 
   useEffect(() => {
@@ -108,7 +114,7 @@ export default function App() {
           throw new Error("something went wrong while fetching movies");
         }
         const data = await res.json();
-        console.log(data);
+        // console.log(data);
 
         if (data.Response === "False") {
           setMovies([]);
@@ -181,7 +187,7 @@ function SearchBar({ query, setQuery }) {
   );
 }
 
-function SelectedMovie({ id, handleCloseMovie, addToWatchedList }) {
+function SelectedMovie({ selectedId, handleCloseMovie, addToWatchedList }) {
   const [movie, setMovie] = useState({});
   const [isLoading, setIsLoading] = useState(false);
   const [rating, setRating] = useState(0);
@@ -204,21 +210,25 @@ function SelectedMovie({ id, handleCloseMovie, addToWatchedList }) {
       Runtime: Number(Runtime.split(" ").at(0)),
       Poster: Poster,
       userRating: rating,
-      imdbID: id,
+      imdbID: selectedId,
     });
   }
   useEffect(() => {
     async function getSelectedMovieData(id) {
       setIsLoading(true);
-      console.log(id);
+      // console.log(id);
       const res = await fetch(`http://www.omdbapi.com/?&apikey=${KEY}&i=${id}`);
       const data = await res.json();
-      console.log(data);
+      // console.log(data);
       setMovie(data);
       setIsLoading(false);
     }
-    getSelectedMovieData(id);
-  }, [id]);
+    getSelectedMovieData(selectedId);
+  }, [selectedId]);
+  useEffect(() => {
+    // console.log(`in effect ${selectedId}`);
+    document.title = `Movie | ${movie.Title}`;
+  }, [movie.Title]);
   return (
     <div className="details">
       {isLoading ? (
@@ -249,24 +259,6 @@ function SelectedMovie({ id, handleCloseMovie, addToWatchedList }) {
                 rating={rating}
                 setRating={setRating}
               />
-              {/* {!isWatched ? (
-                <>
-                  <StarRating
-                    maxRating={10}
-                    size={24}
-                    onSetRating={setUserRating}
-                  />
-                  {userRating > 0 && (
-                    <button className="btn-add" onClick={handleAdd}>
-                      + Add to list
-                    </button>
-                  )}
-                </>
-              ) : (
-                <p>
-                  You rated with movie {watchedUserRating} <span>⭐️</span>
-                </p>
-              )} */}
             </div>
             {
               <button className="btn-add" onClick={handleAddBtn}>
@@ -304,7 +296,7 @@ function Main({
       <Box>
         {selectedId ? (
           <SelectedMovie
-            id={selectedId}
+            selectedId={selectedId}
             handleCloseMovie={handleCloseMovie}
             addToWatchedList={addToWatchedList}
           />
