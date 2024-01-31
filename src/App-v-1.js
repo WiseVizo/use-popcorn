@@ -62,6 +62,21 @@ export default function App() {
   const [selectedId, setSelectedId] = useState(null);
 
   function addToWatchedList(movieData = {}) {
+    const WatchedMovie = watched.filter((movie) => {
+      return movie.imdbID === movieData.imdbID;
+    });
+    // console.log(isWatched);
+    if (WatchedMovie.length > 0) {
+      const movies = watched.map((movie) => {
+        // stupid map returning [undefined, undefined] i shouldn't hv skiped the javascript part :/
+        if (movie.imdbID === movieData.imdbID) {
+          movie.userRating = movieData.userRating;
+        }
+      });
+      console.log(movies);
+      setWatched([...watched]);
+      return;
+    }
     setWatched([...watched, movieData]);
   }
 
@@ -243,9 +258,11 @@ function SelectedMovie({ id, handleCloseMovie, addToWatchedList }) {
                 </p>
               )} */}
             </div>
-            <button className="btn-add" onClick={handleAddBtn}>
-              Add To Watched List
-            </button>
+            {
+              <button className="btn-add" onClick={handleAddBtn}>
+                Add To Watched List
+              </button>
+            }
             <p>
               <em>{Plot}</em>
             </p>
