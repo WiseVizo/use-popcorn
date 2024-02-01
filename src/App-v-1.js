@@ -210,6 +210,14 @@ function SelectedMovie({ selectedId, handleCloseMovie, addToWatchedList }) {
     Director,
     Genre,
   } = movie;
+  useEffect(() => {
+    document.addEventListener("keydown", (e) => {
+      if (e.code === "Escape") {
+        handleCloseMovie();
+        // console.log("closing");
+      }
+    });
+  }, [handleCloseMovie]);
   function handleAddBtn() {
     addToWatchedList({
       Title: Title,
