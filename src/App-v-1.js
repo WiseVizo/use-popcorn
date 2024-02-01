@@ -61,10 +61,10 @@ export default function App() {
   const [error, setError] = useState(null);
   const [selectedId, setSelectedId] = useState(null);
 
-  useEffect(() => {
-    if (selectedId) return;
-    document.title = "usePopcorn";
-  }, [selectedId]);
+  // useEffect(() => {
+  //   if (selectedId) return;
+  //   document.title = "usePopcorn";
+  // }, [selectedId]);
 
   function deleteFromWatchedList(ID) {
     const newList = watched.filter((movie) => {
@@ -228,6 +228,9 @@ function SelectedMovie({ selectedId, handleCloseMovie, addToWatchedList }) {
   useEffect(() => {
     // console.log(`in effect ${selectedId}`);
     document.title = `Movie | ${movie.Title}`;
+    return () => {
+      document.title = "usePopcorn";
+    };
   }, [movie.Title]);
   return (
     <div className="details">
