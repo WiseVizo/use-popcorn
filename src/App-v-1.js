@@ -211,12 +211,16 @@ function SelectedMovie({ selectedId, handleCloseMovie, addToWatchedList }) {
     Genre,
   } = movie;
   useEffect(() => {
-    document.addEventListener("keydown", (e) => {
+    function callback(e) {
       if (e.code === "Escape") {
         handleCloseMovie();
         // console.log("closing");
       }
-    });
+    }
+    document.addEventListener("keydown", callback); // the event listners will accumulate over time as we this component will mount multiple times
+    return function () {
+      document.removeEventListener("keydown", callback); // so we hv to remove them each time component unmout for saving  memory
+    };
   }, [handleCloseMovie]);
   function handleAddBtn() {
     addToWatchedList({
