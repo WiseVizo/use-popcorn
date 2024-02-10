@@ -55,7 +55,10 @@ const KEY = "9b242b09"; // api key
 
 export default function App() {
   const [movies, setMovies] = useState([]);
-  const [watched, setWatched] = useState([]);
+  const [watched, setWatched] = useState(() => {
+    const watchedData = localStorage.getItem("watched");
+    return JSON.parse(watchedData);
+  }); // lazy inital state //* this function only runs in inital render
   const [query, setQuery] = useState("Inception");
   const [isLoading, SetIsLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -66,11 +69,19 @@ export default function App() {
   //   document.title = "usePopcorn";
   // }, [selectedId]);
 
+  useEffect(
+    function () {
+      localStorage.setItem("watched", JSON.stringify([...watched]));
+    },
+    [watched]
+  );
+
   function deleteFromWatchedList(ID) {
     const newList = watched.filter((movie) => {
       return !(movie.imdbID === ID);
     });
     setWatched(newList);
+    // localStorage.setItem("watched", JSON.stringify([...newList]));
   }
 
   function addToWatchedList(movieData = {}) {
@@ -81,15 +92,18 @@ export default function App() {
     if (WatchedMovie.length > 0) {
       const movies = watched.map((movie) => {
         // stupid map returning [undefined, undefined] i shouldn't hv skiped the javascript part :/
+        // * PS: now ik wht was wrong (imagine ignoring ide warnnings:/)
         if (movie.imdbID === movieData.imdbID) {
           movie.userRating = movieData.userRating;
         }
       });
       // console.log(movies);
       setWatched([...watched]);
+      // localStorage.setItem("watched", JSON.stringify([[...watched]]));
       return;
     }
     setWatched([...watched, movieData]);
+    // localStorage.setItem("watched", JSON.stringify([[...watched, movieData]]));
   }
 
   function handleSelectedMovie(id) {
@@ -143,6 +157,7 @@ export default function App() {
       controller.abort();
     };
   }, [query]);
+  // console.log(JSON.parse(localStorage.getItem("watched")));
 
   return (
     <>
@@ -401,7 +416,7 @@ function Summary({ watched }) {
         </p>
         <p>
           <span>⏳</span>
-          <span>{avgRuntime} min</span>
+          <span>{avgRuntime.toFixed(2)} min</span>
         </p>
       </div>
     </div>
