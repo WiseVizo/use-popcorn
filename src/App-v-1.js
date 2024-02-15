@@ -59,7 +59,7 @@ export default function App() {
     const watchedData = localStorage.getItem("watched");
     return JSON.parse(watchedData);
   }); // lazy inital state //* this function only runs in inital render
-  const [query, setQuery] = useState("Inception");
+  const [query, setQuery] = useState("");
   const [isLoading, SetIsLoading] = useState(false);
   const [error, setError] = useState(null);
   const [selectedId, setSelectedId] = useState(null);
